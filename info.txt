@@ -1,0 +1,7 @@
+Scale: 19.4 cm in the whole bottle
+Bottom height ~2 cm is also the radius of the bottle.
+Camera height: 19.4 cm
+From camera to the center of bottle: 35 cm
+
+Manual: 190-20 cm^3 <-> 14.6 cm, t = 4.52 s, v = 0.032 m/s
+$v = \sqrt{2gh} \implies h = v^2/2g = 5.25 \cdot 10^{-5} \ \text{s}$

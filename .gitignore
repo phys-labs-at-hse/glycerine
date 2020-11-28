@@ -1,0 +1,14 @@
+# Large video file, used in `main_script.py`, which can't be uploaded to github
+vid.mp4
+
+# TeX-generated auxilary files
+*.out
+*.snm
+*.nav
+*.aux
+*.log
+*.synctex.gz
+
+# Vim's backup files
+*.swp
+
