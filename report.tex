@@ -1,0 +1,38 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage[no-math]{fontspec-xetex}
+\setmainfont{CMU Sans Serif}
+\usepackage[english, russian]{babel}
+
+\usepackage{blindtext}
+\usepackage{microtype}
+\usepackage{geometry}
+
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{MnSymbol}
+\usepackage{physics}
+
+\usepackage{graphicx, wrapfig, caption, subcaption}
+\usepackage{color,xcolor}
+
+\graphicspath{{figures/}}
+\geometry{margin = 2 cm}
+\geometry{bottom = 3 cm}
+
+\title{Title}
+\author{Роман Ухоботов, Николай Грузинов}
+\date{}%собрано \today}
+
+\begin{document}
+\maketitle
+
+\noindent
+Как тебе такой стиль?
+Часть отчета можно взять из \verb|theory.tex|. \\
+Собирать с помощью Xe\LaTeX, иначе будут ошибки.
+
+\section{Test}
+\blindtext
+\blindtext
+
+\end{document}
