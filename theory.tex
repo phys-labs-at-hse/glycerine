@@ -1,7 +1,19 @@
 \documentclass[a4paper, 12pt]{article}
 
-\input{/home/nick/Desktop/notetaking/used_packages_ru.tex}
-\input{/home/nick/Desktop/notetaking/user_defined_commands_ru.sty}
+\usepackage[no-math]{fontspec-xetex}
+\setmainfont{CMU Sans Serif}
+\usepackage[english, russian]{babel}
+
+\usepackage{blindtext}
+\usepackage{microtype}
+\usepackage{geometry}
+
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{MnSymbol}
+\usepackage{physics}
+
+\usepackage{graphicx, wrapfig, caption, subcaption}
+\usepackage{color,xcolor}
 
 \graphicspath{{figures/}}
 \geometry{margin = 2 cm}
@@ -29,7 +41,7 @@
 \[ m g = 3 \pi d \eta V+\rho g \frac{\pi d^{3}}{6} \]
 \[ \eta = \frac{m g-\rho g \frac{\pi d^{3}}{6} }{3 \pi d V} \]
 
-\section*{Текст ниже про то, как это стоило бы делать, если бы не большая погрешность при численном дифференцировании}
+\section*{Как стоило бы делать, если бы не большая погрешность при численном дифференцировании?}
 
 Пусть диаметр шарика $d$, масса $m$, плотность глицерина $\rho$, вязкость $\eta$.
 Второй закон Ньютона для шарика, в проекции на ось OX, направленную вниз ($v_x > 0$)
@@ -37,7 +49,7 @@
 \[ m \dv{v_x}{t} = -3 \pi \eta d v_x - \rho g \frac{\pi d^3}6 + mg \]
 \[ \dv{v_x}{t} = -\frac{3 \pi \eta d}m v_x - \frac{\rho g \pi d^3}{6 m} + g \]
 \[ \dv{v_x}{t} = -\frac{3 \pi \eta d}m \left(v_x + \frac{\frac{\rho g \pi d^3}{6} - mg}{3 \pi \eta d}\right) \]
-Обозначу $c = \frac{mg - \frac{\rho g \pi d^3}{6}}{3 \pi \eta d}$, $v_x' = v_x - c$, $k = \frac{3 \pi \eta d}m$.
+Обозначу $c = \frac{mg - \frac{\rho g \pi d^3}{6}}{3 \pi \eta d}$ (установившаяся скорость), $v_x' = v_x - c$, $k = \frac{3 \pi \eta d}m$ (коэффициент в экспоненте).
 Тогда $c > 0$, $k > 0$, и
 \[ \dv{v_x'}{t} = -k v_x' \qquad\implies\qquad v_x'(t) = \bigl(v_{x_0} - c\bigr)\exp(-kt) \]
 \[ v_x(t) = \bigl(v_{x_0} -  c\bigr)\exp(-kt) + c .\] 
@@ -57,7 +69,24 @@ x(t) = \int_{0}^t v_x(t') \dd t' = \int_{0}^t \Bigl((v_{x_0} -  c)\exp(-kt') + c
 Из $c$ можно получить плотность глицерина $\rho$ и сравнить ее с табличными значениями.
 
 При взгляде на данные видно, что ничего хорошего из этой идеи не выйдет, потому что качественно посчитать скорость в каждой точке не представляется возможным.
+(Возможно, стоило попробовать это сгладить, используя moving average).
 \begin{center}
 \includegraphics[width=0.6\linewidth]{bad_numericall_differentiation.png}
 \end{center}
+
+\section*{Как быстро устанавливается скорость шарика?}
+Скорость задаётся уравнением
+\[ v_x(t) = \bigl(v_{x_0} -  c\bigr)\exp(-kt) + c .\] 
+Взяв какие-то разумные значения параметров, можно найти момент времени $\tau$ в который скорость будет отличаться, скажем, на $0.01$ от установившейся, то есть $v_x(\tau) = 1.01 c$:
+\[ t = \frac{1}{k} \ln(\frac{v_{x_0} -  c}{v_x -  c}) .\]
+\[ \tau = \frac{1}{k} \ln(\frac{v_{x_0} -  c}{0.01c}) .\]
+Предположим, что мы отпустили шарик на высоте $h = 0.05$~м (на самом деле меньше).
+Тогда $v_{x_0} = \sqrt{2gh} \approx 1$ м/с.
+Для самого тяжелого шарика, примерно
+\[ m = 3.9 \cdot 10^{-4} \text{ кг} \qquad d = 4 \cdot 10^{-3} \text{ м} .\]
+Если взять табличное значение плотности $\rho = 1.12$~кг/м$^3$ и ожидаемое $\eta = 1.2$ для вязкости, то по вычислениям в файле $\verb|calculate_when_stable.py|$ получается
+\[ c = 8.5 \text{ см/с} \qquad k = 116 \text{ 1/с} \qquad \tau = 0.06 \text{ c} .\]
+А это означает, что шарик к моменту попадания в кадр уже имеет установившуюся скорость, и дальнейшее уменьшение скорости стоит объяснять изменением вязкости.
+Тогда можно считать, что в каждый момент времени скорость --- установившаяся для данной глубины, а данные обработать следующим образом: для каждого шарика численно продифференцировать $x(t)$, пересчитать в зависимость вязкости от высоты $\eta(x)$,потом усреднить $\eta(x)$ по всем шарикам.
+Должно получиться много шумов, но усреднение должно помочь.
 \end{document}
