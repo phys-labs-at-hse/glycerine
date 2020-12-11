@@ -38,8 +38,10 @@
 По $V$ можно найти вязкость $\eta$.
 Возьму уравнение из методички, и немного перепишу.
 Пусть $d$ --- диаметр шарика.
-\[ m g = 3 \pi d \eta V+\rho g \frac{\pi d^{3}}{6} \]
-\[ \eta = \frac{m g-\rho g \frac{\pi d^{3}}{6} }{3 \pi d V} \]
+\begin{gather*}
+    m g = 3 \pi d \eta V+\rho g \frac{\pi d^{3}}{6}\\
+    \eta = \frac{m g-\rho g \frac{\pi d^{3}}{6} }{3 \pi d V}\\
+\end{gather*}
 
 \section*{Как стоило бы делать, если бы не большая погрешность при численном дифференцировании?}
 
@@ -52,7 +54,7 @@
 Обозначу $c = \frac{mg - \frac{\rho g \pi d^3}{6}}{3 \pi \eta d}$ (установившаяся скорость), $v_x' = v_x - c$, $k = \frac{3 \pi \eta d}m$ (коэффициент в экспоненте).
 Тогда $c > 0$, $k > 0$, и
 \[ \dv{v_x'}{t} = -k v_x' \qquad\implies\qquad v_x'(t) = \bigl(v_{x_0} - c\bigr)\exp(-kt) \]
-\[ v_x(t) = \bigl(v_{x_0} -  c\bigr)\exp(-kt) + c .\] 
+\[ v_x(t) = \bigl(v_{x_0} -  c\bigr)\exp(-kt) + c .\]
 \[
 x(t) = \int_{0}^t v_x(t') \dd t' = \int_{0}^t \Bigl((v_{x_0} -  c)\exp(-kt') + c\Bigr) \dd t' =
 	   \frac{(v_{x_0} -  c)}{-k}\exp(-kt') + ct + x_0
