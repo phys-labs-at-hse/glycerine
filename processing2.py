@@ -125,3 +125,56 @@ with open('viscosity_at_height_averaged.csv', 'w') as file:
     file.write('height (cm), viscosity (Pa*s)\n')
     for i in range(len(all_x_averaged)):
         file.write(f'{all_x_averaged[i]}, {all_viscosities_averaged[i]}\n')
+
+# Roughly check for bias in balls' diameters.
+# The plot above didn't distinguish between viscosities calculated from
+# different balls, but it's interesting to see if viscosity is systematically
+# different for some balls. That would mean an error in diameter.
+plt.plot(); plt.ylim(1.1, 1.8)
+for i in range(10):
+    x, t = read_ball_csv(csv_paths[i])
+    speeds = np.gradient(x, t)
+    viscosities = map(lambda speed: get_viscosity(speed, masses[i], diameters[i]), speeds)
+    viscosities = np.array(list(viscosities))
+    w = 20
+    x = x[int(w/2 - 1):int(-w/2)]
+    viscosities = moving_average(viscosities, w)
+    if i < 3:
+        plt.scatter(x, viscosities, label = i + 1, color = 'gray')
+    else:
+        plt.scatter(x, viscosities, label = i + 1)
+    plt.legend()
+plt.grid(); plt.xlabel('Пройденное расстояние, см', fontsize = 18)
+plt.ylabel('Вязкость, Па·с', fontsize = 18)
+
+# There clearly is a bias; let's adjust the diameters according to the known
+# density of lead: 11300 kg/m^3.
+
+# Print densities with measured diameters
+for i in range(10):
+    volume = np.pi * (diameters[i]/1000)**3/6
+    print((masses[i]/1000)/volume)
+# Steel is OK, while lead is often incorrect
+
+adjusted_diameters = diameters.copy()
+for i in range(3, 10):
+    # Adjusted diameter is in millimeters, and mass is in grams
+    adjusted_diameters[i] = ((masses[i]/1000/11300) * 6 / np.pi)**(1/3) * 1000
+
+plt.close(); plt.plot(); plt.ylim(1.1, 1.8)
+for i in range(10):
+    x, t = read_ball_csv(csv_paths[i])
+    speeds = np.gradient(x, t)
+    viscosities = map(lambda speed: get_viscosity(speed, masses[i], adjusted_diameters[i]), speeds)
+    viscosities = np.array(list(viscosities))
+    w = 20
+    x = x[int(w/2 - 1):int(-w/2)]
+    viscosities = moving_average(viscosities, w)
+    if i < 3:
+        plt.scatter(x, viscosities, label = i + 1, color = 'gray')
+    else:
+        plt.scatter(x, viscosities, label = i + 1)
+    plt.legend()
+plt.title('With adjusted diameters'); plt.grid()
+plt.xlabel('Пройденное расстояние, см', fontsize = 18)
+plt.ylabel('Вязкость, Па·с', fontsize = 18)
