@@ -6,11 +6,11 @@
 # Most convenience functions are taken from `processing.py`.
 
 
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats, interpolate
 import csv
+
+import matplotlib.pyplot as plt
+import numpy as np
+import processing
 
 
 def read_ball_csv(filepath):
@@ -32,10 +32,10 @@ def get_viscosity(speed, mass, diameter):
     mass /= 1000
     diameter /= 1000
     speed /= 100
-    return g*(mass - rho * np.pi * diameter**3 / 6)/(3 * np.pi * diameter * speed)
+    return g * (mass - rho * np.pi * diameter ** 3 / 6) / (3 * np.pi * diameter * speed)
 
 
-def moving_average(x, w = 3):
+def moving_average(x, w=3):
     """Calculate moving average of x using w neighbours"""
     return np.convolve(x, np.ones(w), 'valid') / w
 
@@ -57,7 +57,8 @@ csv_paths = [
 diameters, masses = [], []
 with open('balls.csv') as file:
     csv_reader = csv.reader(file, delimiter=',')
-    next(csv_reader); next(csv_reader)
+    next(csv_reader);
+    next(csv_reader)
     for row in csv_reader:
         diameters.append(float(row[1]))
         masses.append(float(row[2]))
@@ -79,14 +80,14 @@ all_x = all_x[indices]
 all_viscosities = all_viscosities[indices]
 
 # Get rid of the duplicates
-indices = np.argwhere(np.diff(all_x) == 0) # 98, 1025
+indices = np.argwhere(np.diff(all_x) == 0)  # 98, 1025
 all_x = np.delete(all_x, indices)
 all_viscosities = np.delete(all_viscosities, indices)
 
 # Plot with a moving-averaged line
 w = 30
 plt.scatter(all_x, all_viscosities)
-plt.scatter(all_x[int(w/2 - 1):int(-w/2)], moving_average(all_viscosities, w))
+plt.scatter(all_x[int(w / 2 - 1):int(-w / 2)], moving_average(all_viscosities, w))
 
 # Remove the noise due to boundary effects in multiple places
 indices = (all_x > 0.5) * (all_x < 17.5)
@@ -100,19 +101,19 @@ all_viscosities = all_viscosities[indices]
 # Convert x from 'distance passed since appearance in the video'
 # into 'distance from the bottom', using `info.txt`
 # Invert and add distance from the bottom till the notch 250
-all_x = (19.4 + 20/(250 - 20)*19.4) - all_x
+all_x = (19.4 + 20 / (250 - 20) * 19.4) - all_x
 
 # Plot with a moving-averaged line, once again, with style
 w = 120
-all_x_averaged = all_x[int(w/2 - 1):int(-w/2)]
+all_x_averaged = all_x[int(w / 2 - 1):int(-w / 2)]
 all_viscosities_averaged = moving_average(all_viscosities, w)
 
 plt.close()
 plt.scatter(all_x, all_viscosities)
 plt.scatter(all_x_averaged, all_viscosities_averaged)
 plt.grid()
-plt.xlabel('Расстояние до дна, см', fontsize = 18)
-plt.ylabel('Вязкость, Па·с', fontsize = 18)
+plt.xlabel('Расстояние до дна, см', fontsize=18)
+plt.ylabel('Вязкость, Па·с', fontsize=18)
 
 # Save the viscosity data to csv tables to be attached to the report
 with open('viscosity_at_height.csv', 'w') as file:
@@ -130,51 +131,53 @@ with open('viscosity_at_height_averaged.csv', 'w') as file:
 # The plot above didn't distinguish between viscosities calculated from
 # different balls, but it's interesting to see if viscosity is systematically
 # different for some balls. That would mean an error in diameter.
-plt.plot(); plt.ylim(1.1, 1.8)
+plt.plot();
+plt.ylim(1.1, 1.8)
 for i in range(10):
     x, t = read_ball_csv(csv_paths[i])
     speeds = np.gradient(x, t)
     viscosities = map(lambda speed: get_viscosity(speed, masses[i], diameters[i]), speeds)
     viscosities = np.array(list(viscosities))
     w = 20
-    x = x[int(w/2 - 1):int(-w/2)]
+    x = x[int(w / 2 - 1):int(-w / 2)]
     viscosities = moving_average(viscosities, w)
-    if i < 3:
-        plt.scatter(x, viscosities, label = i + 1, color = 'gray')
-    else:
-        plt.scatter(x, viscosities, label = i + 1)
-    plt.legend()
-plt.grid(); plt.xlabel('Пройденное расстояние, см', fontsize = 18)
-plt.ylabel('Вязкость, Па·с', fontsize = 18)
+    plt.scatter(x, viscosities, label=f'{i + 1}', color=processing.colors[i])
+plt.legend()
+plt.grid()
+plt.xlabel('Пройденное расстояние, см', fontsize=18)
+plt.ylabel('Вязкость, Па·с', fontsize=18)
 
 # There clearly is a bias; let's adjust the diameters according to the known
 # density of lead: 11300 kg/m^3.
 
 # Print densities with measured diameters
 for i in range(10):
-    volume = np.pi * (diameters[i]/1000)**3/6
-    print((masses[i]/1000)/volume)
+    volume = np.pi * (diameters[i] / 1000) ** 3 / 6
+    print((masses[i] / 1000) / volume)
 # Steel is OK, while lead is often incorrect
 
 adjusted_diameters = diameters.copy()
 for i in range(3, 10):
     # Adjusted diameter is in millimeters, and mass is in grams
-    adjusted_diameters[i] = ((masses[i]/1000/11300) * 6 / np.pi)**(1/3) * 1000
+    adjusted_diameters[i] = ((masses[i] / 1000 / 11300) * 6 / np.pi) ** (1 / 3) * 1000
 
-plt.close(); plt.plot(); plt.ylim(1.1, 1.8)
+plt.close()
+plt.plot()
+plt.ylim(1.1, 1.8)
 for i in range(10):
     x, t = read_ball_csv(csv_paths[i])
     speeds = np.gradient(x, t)
     viscosities = map(lambda speed: get_viscosity(speed, masses[i], adjusted_diameters[i]), speeds)
     viscosities = np.array(list(viscosities))
     w = 20
-    x = x[int(w/2 - 1):int(-w/2)]
+    x = x[int(w / 2 - 1):int(-w / 2)]
     viscosities = moving_average(viscosities, w)
     if i < 3:
-        plt.scatter(x, viscosities, label = i + 1, color = 'gray')
+        plt.scatter(x, viscosities, label=i + 1, color='gray')
     else:
-        plt.scatter(x, viscosities, label = i + 1)
+        plt.scatter(x, viscosities, label=i + 1)
     plt.legend()
-plt.title('With adjusted diameters'); plt.grid()
-plt.xlabel('Пройденное расстояние, см', fontsize = 18)
-plt.ylabel('Вязкость, Па·с', fontsize = 18)
+plt.title('With adjusted diameters');
+plt.grid()
+plt.xlabel('Пройденное расстояние, см', fontsize=18)
+plt.ylabel('Вязкость, Па·с', fontsize=18)

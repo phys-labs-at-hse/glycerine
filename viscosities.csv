@@ -9,5 +9,3 @@ speed (cm/s), speed uncertainty (cm/s), viscosity (Pa*s)
 6.51, 0.06, 1.537
 6.26, 0.05, 1.586
 6.31, 0.06, 1.557
-# mean viscosity: 1.57 Pa*s
-# uncertainty of viscosity: 2std = 0.15 Pa*s

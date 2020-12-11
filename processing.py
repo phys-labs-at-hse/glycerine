@@ -23,7 +23,7 @@ def abline(slope, intercept, color='b'):
     axes = plt.gca()
     x_vals = np.array(axes.get_xlim())
     y_vals = intercept + slope * x_vals
-    plt.plot(x_vals, y_vals, '--', color=color, linewidth=2)
+    plt.plot(x_vals, y_vals, '--', color=color, linewidth=1)
 
 
 x, t = read_ball_csv('particular_balls/ball_05.csv')
@@ -95,6 +95,8 @@ with open('balls.csv') as file:
         diameters.append(float(row[1]))
         masses.append(float(row[2]))
 
+assert (len(masses) == 10)
+
 
 # Calculate the viscosity from parameters and speed
 def get_viscosity(speed, mass, diameter):
@@ -118,25 +120,31 @@ with open('viscosities.csv', 'w') as file:
         file.write(f'{speeds[i]}, {speed_uncertainties[i]}, {viscosities[i]}\n')
 
 # Get a fancy plot, displaying x(t) for each of the four types of balls:
-# (1-3), (4-5), (6-7), (8-10)
-x1, t1 = read_ball_csv('particular_balls/ball_01.csv')
-x2, t2 = read_ball_csv('particular_balls/ball_05.csv')
-x3, t3 = read_ball_csv('particular_balls/ball_07.csv')
-x4, t4 = read_ball_csv('particular_balls/ball_10.csv')
+# plotting_balls = [1, 4, 6, 8]
+plotting_balls = range(10)
 
 plt.close()
-plt.scatter(t1, x1, label='1, m ≈ 3.8 г')
-plt.scatter(t2, x2, label='2, m ≈ 2.4 г')
-plt.scatter(t3, x3, label='3, m ≈ 3.0 г')
-plt.scatter(t4, x4, label='4, m ≈ 4.0 г')
+plt.figure(figsize=(6, 4))
 plt.grid()
+
+colors = ['#6929c4', '#1192e8', '#005d5d', '#9f1853', '#fa4d56', '#570408', '#198038', '#002d9c', '#ee538b', '#b28600']
+
+for i in plotting_balls:
+    x, t = read_ball_csv(f'particular_balls/ball_{i + 1:02d}.csv')
+    plt.scatter(t, x, s=8, c=colors[i], label=f'{i + 1}, m ≈ {masses[i]:.2f} г', )
+
 plt.ylim(ymin=0)
 plt.xlim(xmin=0)
-plt.legend(fontsize=14)
-plt.xlabel('Время, с', fontsize=18)
-plt.ylabel('Глубина, см', fontsize=18)
-abline(speeds[0], 1.5, 'k')
-abline(speeds[4], 1.75, 'k')
+plt.tick_params(labelsize=8)
+plt.legend(fontsize=8)
+plt.xlabel('Время, с', fontsize=8)
+plt.ylabel('Глубина, см', fontsize=8)
+
+abline(speeds[1], 1.71, 'k')
+abline(speeds[4], 1.71, 'k')
+abline(speeds[7], 1.71, 'k')
+
+plt.savefig('figures/position-time.png')
 
 # Get some statistics
 np.mean(viscosities)
