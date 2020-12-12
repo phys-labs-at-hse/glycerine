@@ -10,6 +10,7 @@ import csv
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 import processing
 
 
@@ -40,24 +41,15 @@ def moving_average(x, w=3):
     return np.convolve(x, np.ones(w), 'valid') / w
 
 
-csv_paths = [
-    'particular_balls/ball_01.csv',
-    'particular_balls/ball_02.csv',
-    'particular_balls/ball_03.csv',
-    'particular_balls/ball_04.csv',
-    'particular_balls/ball_05.csv',
-    'particular_balls/ball_06.csv',
-    'particular_balls/ball_07.csv',
-    'particular_balls/ball_08.csv',
-    'particular_balls/ball_09.csv',
-    'particular_balls/ball_10.csv',
-]
+def csv_path(n):
+    return f'particular_balls/ball_{n + 1:02d}.csv'
+
 
 # Balls' characteristics
 diameters, masses = [], []
 with open('balls.csv') as file:
     csv_reader = csv.reader(file, delimiter=',')
-    next(csv_reader);
+    next(csv_reader)
     next(csv_reader)
     for row in csv_reader:
         diameters.append(float(row[1]))
@@ -66,7 +58,7 @@ with open('balls.csv') as file:
 # Get a list of viscosity(height) data merged across the balls
 all_viscosities, all_x = [], []
 for i in range(10):
-    x, t = read_ball_csv(csv_paths[i])
+    x, t = read_ball_csv(csv_path(i))
     all_x.extend(x)
     speeds = np.gradient(x, t)
     viscosities = list(map(lambda speed: get_viscosity(speed, masses[i], diameters[i]), speeds))
@@ -131,21 +123,25 @@ with open('viscosity_at_height_averaged.csv', 'w') as file:
 # The plot above didn't distinguish between viscosities calculated from
 # different balls, but it's interesting to see if viscosity is systematically
 # different for some balls. That would mean an error in diameter.
-plt.plot();
+plt.plot()
+plt.figure(figsize=(6, 4))
+plt.grid()
 plt.ylim(1.1, 1.8)
 for i in range(10):
-    x, t = read_ball_csv(csv_paths[i])
+    x, t = read_ball_csv(csv_path(i))
     speeds = np.gradient(x, t)
     viscosities = map(lambda speed: get_viscosity(speed, masses[i], diameters[i]), speeds)
     viscosities = np.array(list(viscosities))
     w = 20
     x = x[int(w / 2 - 1):int(-w / 2)]
     viscosities = moving_average(viscosities, w)
-    plt.scatter(x, viscosities, label=f'{i + 1}', color=processing.colors[i])
-plt.legend()
-plt.grid()
-plt.xlabel('Пройденное расстояние, см', fontsize=18)
-plt.ylabel('Вязкость, Па·с', fontsize=18)
+    plt.plot(x, viscosities, label=f'{i + 1}', color=processing.colors[i])
+
+plt.tick_params(labelsize=8)
+plt.legend(fontsize=8)
+plt.xlabel('Пройденное расстояние, см', fontsize=8)
+plt.ylabel('Вязкость, Па·с', fontsize=8)
+plt.savefig('figures/viscosity-position.png')
 
 # There clearly is a bias; let's adjust the diameters according to the known
 # density of lead: 11300 kg/m^3.
@@ -165,7 +161,7 @@ plt.close()
 plt.plot()
 plt.ylim(1.1, 1.8)
 for i in range(10):
-    x, t = read_ball_csv(csv_paths[i])
+    x, t = read_ball_csv(csv_path(i))
     speeds = np.gradient(x, t)
     viscosities = map(lambda speed: get_viscosity(speed, masses[i], adjusted_diameters[i]), speeds)
     viscosities = np.array(list(viscosities))
@@ -177,7 +173,7 @@ for i in range(10):
     else:
         plt.scatter(x, viscosities, label=i + 1)
     plt.legend()
-plt.title('With adjusted diameters');
+plt.title('With adjusted diameters')
 plt.grid()
 plt.xlabel('Пройденное расстояние, см', fontsize=18)
 plt.ylabel('Вязкость, Па·с', fontsize=18)

@@ -131,7 +131,7 @@ colors = ['#6929c4', '#1192e8', '#005d5d', '#9f1853', '#fa4d56', '#570408', '#19
 
 for i in plotting_balls:
     x, t = read_ball_csv(f'particular_balls/ball_{i + 1:02d}.csv')
-    plt.scatter(t, x, s=8, c=colors[i], label=f'{i + 1}, m ≈ {masses[i]:.2f} г', )
+    plt.plot(t, x, c=colors[i], label=f'{i + 1}, m ≈ {masses[i]:.2f} г', )
 
 plt.ylim(ymin=0)
 plt.xlim(xmin=0)
