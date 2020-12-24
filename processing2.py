@@ -23,7 +23,7 @@ def read_ball_csv(filepath):
         for row in csv_reader:
             x.append(float(row[0]))
             t.append(float(row[1]))
-    return (np.array(x), np.array(t))
+    return np.array(x), np.array(t)
 
 
 def get_viscosity(speed, mass, diameter):
@@ -130,11 +130,11 @@ plt.ylim(1.1, 1.8)
 for i in range(10):
     x, t = read_ball_csv(csv_path(i))
     speeds = np.gradient(x, t)
-    viscosities = map(lambda speed: get_viscosity(speed, masses[i], diameters[i]), speeds)
-    viscosities = np.array(list(viscosities))
+    viscosities = list(map(lambda speed: get_viscosity(speed, masses[i], diameters[i]), speeds))
+    # viscosities = np.array(list(viscosities))
     w = 20
     x = x[int(w / 2 - 1):int(-w / 2)]
-    viscosities = moving_average(viscosities, w)
+    # viscosities = moving_average(viscosities, w)
     plt.plot(x, viscosities, label=f'{i + 1}', color=processing.colors[i])
 
 plt.tick_params(labelsize=8)

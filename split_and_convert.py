@@ -38,6 +38,6 @@ for i in range(len(coords)):
 
 # Write each ball's data into separate file
 for i in range(10):
-    with open(f'particular_balls/ball_{str(i + 1).zfill(2)}.csv', 'a') as file:
+    with open(f'particular_balls/ball_{i + 1:d02}.csv', 'a') as file:
         for j in range(len(coords[i])):
             file.write(f'{coords[i][j]},{nframes[i][j]}\n')
