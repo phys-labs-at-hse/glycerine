@@ -2,7 +2,7 @@ import math
 
 g = 9.82
 rho = 1.12
-eta = 1.2
+eta = 0.5
 mass = 3.9e-4
 diameter = 4e-3
 print(f'Test: density is {mass / (math.pi * diameter**3 / 6)} kg/m^3')
