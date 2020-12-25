@@ -14,4 +14,9 @@ vid.mp4
 # Vim's backup files
 *.swp
 
+# PyCharm's metadata
+.idea
+out
+__pycache__
+
 egor_zakutey_report.pdf
